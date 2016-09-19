@@ -53,7 +53,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 		<framework src="com.google.firebase:firebase-core:+" />
 		<framework src="com.google.firebase:firebase-messaging:+" />
-		<framework src="com.google.firebase:firebase-crash:+" />
+		<!-- <framework src="com.google.firebase:firebase-crash:+" />-->
 		<framework src="com.google.firebase:firebase-config:+" />
 	</platform>
 
@@ -91,7 +91,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleUtilities.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/GoogleIPhoneUtilities.framework" />
-		<framework custom="true" src="src/ios/Firebase/Crash/FirebaseCrash.framework" />
+		<!-- <framework custom="true" src="src/ios/Firebase/Crash/FirebaseCrash.framework" />-->
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
 	</platform>
 
