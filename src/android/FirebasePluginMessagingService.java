@@ -43,29 +43,33 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         String title;
         String text;
+        String icon;
         String id;
         if (remoteMessage.getNotification() != null) {
             title = remoteMessage.getNotification().getTitle();
             text = remoteMessage.getNotification().getBody();
+            icon = remoteMessage.getNotification().getIcon();
             id = remoteMessage.getMessageId();
         } else {
             title = remoteMessage.getData().get("title");
             text = remoteMessage.getData().get("text");
+            icon = null;
             id = remoteMessage.getData().get("id");
 
         }
         Log.d(TAG, "From: " + remoteMessage.getFrom());
         Log.d(TAG, "Notification Message id: " + id);
         Log.d(TAG, "Notification Message Title: " + title);
+        Log.d(TAG, "Notification Message Icon: " + icon);
         Log.d(TAG, "Notification Message Body/Text: " + text);
 
         // TODO: Add option to developer to configure if show notification when app on foreground
         if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title)) {
-            sendNotification(id, title, text, remoteMessage.getData());
+            sendNotification(id, title, text, icon, remoteMessage.getData());
         }
     }
 
-    private void sendNotification(String id, String title, String messageBody, Map<String, String> data) {
+    private void sendNotification(String id, String title, String messageBody, String iconName, Map<String, String> data) {
         Intent intent = new Intent(this, OnNotificationOpenReceiver.class);
         Bundle bundle = new Bundle();
         for (String key : data.keySet()) {
@@ -75,9 +79,20 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id.hashCode(), intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
+        int icon = getApplicationInfo().icon;
+        if (iconName != null && iconName.length() > 0) {
+            final int iconId = this.getResources().getIdentifier(iconName, "drawable", this.getPackageName());
+            if (iconId > 0) {
+                Log.d(TAG, "Using icon with name ["+iconName+"]");
+                icon = iconId;
+            } else {
+                Log.w(TAG, "Icon with name ["+iconName+"] not found, using default.");
+            }
+        }
+
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(getApplicationInfo().icon)
+                .setSmallIcon(icon)
                 .setContentTitle(title)
                 .setContentText(messageBody)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody))
