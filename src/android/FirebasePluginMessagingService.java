@@ -16,6 +16,8 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 
 public class FirebasePluginMessagingService extends FirebaseMessagingService {
@@ -49,9 +51,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             title = remoteMessage.getNotification().getTitle();
             text = remoteMessage.getNotification().getBody();
             icon = remoteMessage.getNotification().getIcon();
-            id = remoteMessage.getMessageId() != null ?
-                    remoteMessage.getMessageId() :
-                    remoteMessage.getData().get("id");
+            id = remoteMessage.getMessageId();
         } else {
             title = remoteMessage.getData().get("title");
             text = remoteMessage.getData().get("text");
@@ -66,8 +66,8 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "Notification Message Body/Text: " + text);
 
         if (id == null) {
-            Log.w(TAG, "No message id, ignoring message");
-            return;
+            Log.d(TAG, "No message id, generating random");
+            id = UUID.randomUUID().toString();
         }
 
         // TODO: Add option to developer to configure if show notification when app on foreground
