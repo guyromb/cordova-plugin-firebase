@@ -49,7 +49,9 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             title = remoteMessage.getNotification().getTitle();
             text = remoteMessage.getNotification().getBody();
             icon = remoteMessage.getNotification().getIcon();
-            id = remoteMessage.getMessageId();
+            id = remoteMessage.getMessageId() != null ?
+                    remoteMessage.getMessageId() :
+                    remoteMessage.getData().get("id");
         } else {
             title = remoteMessage.getData().get("title");
             text = remoteMessage.getData().get("text");
@@ -62,6 +64,11 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "Notification Message Title: " + title);
         Log.d(TAG, "Notification Message Icon: " + icon);
         Log.d(TAG, "Notification Message Body/Text: " + text);
+
+        if (id == null) {
+            Log.w(TAG, "No message id, ignoring message");
+            return;
+        }
 
         // TODO: Add option to developer to configure if show notification when app on foreground
         if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title)) {
@@ -105,6 +112,4 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
         notificationManager.notify(id.hashCode(), notificationBuilder.build());
     }
-
-
 }
