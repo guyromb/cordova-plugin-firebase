@@ -83,7 +83,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         }
     }
 
-    private void sendNotification(String id, String title, String messageBody, String iconName Map<String, String> data, boolean showNotification) {
+    private void sendNotification(String id, String title, String messageBody, String iconName, Map<String, String> data, boolean showNotification) {
         Bundle bundle = new Bundle();
         for (String key : data.keySet()) {
             bundle.putString(key, data.get(key));
