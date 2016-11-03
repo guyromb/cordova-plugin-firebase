@@ -17,7 +17,6 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
 
 
 public class FirebasePluginMessagingService extends FirebaseMessagingService {
@@ -71,11 +70,6 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "Notification Message Icon: " + icon);
         Log.d(TAG, "Notification Message Body/Text: " + text);
 
-        if (id == null) {
-            Log.d(TAG, "No message id, generating random");
-            id = UUID.randomUUID().toString();
-        }
-
         // TODO: Add option to developer to configure if show notification when app on foreground
         if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title)) {
             boolean showNotification = FirebasePlugin.inBackground() || !FirebasePlugin.hasNotificationsCallback();
@@ -88,33 +82,32 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         for (String key : data.keySet()) {
             bundle.putString(key, data.get(key));
         }
-
         if (showNotification) {
             Intent intent = new Intent(this, OnNotificationOpenReceiver.class);
             intent.putExtras(bundle);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id.hashCode(), intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
-            int icon = getApplicationInfo().icon;
-            if (iconName != null && iconName.length() > 0) {
-                final int iconId = this.getResources().getIdentifier(iconName, "drawable", this.getPackageName());
-                if (iconId > 0) {
-                    Log.d(TAG, "Using icon with name ["+iconName+"]");
-                    icon = iconId;
-                } else {
-                    Log.w(TAG, "Icon with name ["+iconName+"] not found, using default.");
-                }
-            }
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                    .setSmallIcon(icon)
                     .setContentTitle(title)
                     .setContentText(messageBody)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody))
                     .setAutoCancel(true)
                     .setSound(defaultSoundUri)
                     .setContentIntent(pendingIntent);
+
+            if (TextUtils.isEmpty(iconName)) {
+                iconName = "notification_icon";
+            }
+
+            int resID = getResources().getIdentifier(iconName, "drawable", this.getPackageName());
+            if (resID != 0) {
+                notificationBuilder.setSmallIcon(resID);
+            } else {
+                notificationBuilder.setSmallIcon(getApplicationInfo().icon);
+            }
 
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
